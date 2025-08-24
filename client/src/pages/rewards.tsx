@@ -258,7 +258,7 @@ export default function Rewards() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {rewards.map((reward: Reward) => (
+                  {(rewards as Reward[]).map((reward: Reward) => (
                     <div key={reward.id} className="border border-gray-200 rounded-lg p-3" data-testid={`reward-${reward.id}`}>
                       <div className="flex items-center space-x-3 mb-2">
                         {getRewardIcon(reward.category)}

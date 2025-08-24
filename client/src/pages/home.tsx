@@ -19,7 +19,7 @@ export default function Home() {
     staleTime: 30 * 1000, // 30 seconds
   });
 
-  const filteredLots = parkingLots.filter((lot: ParkingLot) => {
+  const filteredLots = (parkingLots as ParkingLot[]).filter((lot: ParkingLot) => {
     if (searchQuery) {
       return lot.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
              lot.address.toLowerCase().includes(searchQuery.toLowerCase());

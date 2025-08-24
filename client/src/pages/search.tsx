@@ -263,9 +263,9 @@ export default function Search() {
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
                 <p>Đang tìm kiếm...</p>
               </div>
-            ) : searchResults.length > 0 ? (
+            ) : (searchResults as ParkingLot[]).length > 0 ? (
               <div className="space-y-4" data-testid="search-results">
-                {searchResults.map((lot: ParkingLot) => (
+                {(searchResults as ParkingLot[]).map((lot: ParkingLot) => (
                   <ParkingCard
                     key={lot.id}
                     lot={lot}

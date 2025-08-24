@@ -167,7 +167,9 @@ export class MemStorage implements IStorage {
       id, 
       points: 0,
       memberTier: "bronze",
-      createdAt: new Date() 
+      createdAt: new Date(),
+      phone: insertUser.phone || null,
+      vehicleType: insertUser.vehicleType || "motorcycle"
     };
     this.users.set(id, user);
     return user;
@@ -200,8 +202,10 @@ export class MemStorage implements IStorage {
     const lot: ParkingLot = { 
       ...insertLot, 
       id,
-      currentMotorcycleSpots: insertLot.motorcycleCapacity,
-      currentCarSpots: insertLot.carCapacity,
+      motorcycleCapacity: insertLot.motorcycleCapacity || 0,
+      carCapacity: insertLot.carCapacity || 0,
+      currentMotorcycleSpots: insertLot.motorcycleCapacity || 0,
+      currentCarSpots: insertLot.carCapacity || 0,
       rating: "0",
       totalReviews: 0,
       status: "active",
@@ -272,7 +276,7 @@ export class MemStorage implements IStorage {
 
   async createReview(insertReview: InsertReview): Promise<Review> {
     const id = randomUUID();
-    const review: Review = { ...insertReview, id, createdAt: new Date() };
+    const review: Review = { ...insertReview, id, createdAt: new Date(), comment: insertReview.comment || null };
     this.reviews.set(id, review);
 
     // Update parking lot rating
@@ -305,7 +309,8 @@ export class MemStorage implements IStorage {
       ...insertUpdate, 
       id, 
       pointsEarned: 10,
-      createdAt: new Date() 
+      createdAt: new Date(),
+      comment: insertUpdate.comment || null
     };
     this.communityUpdates.set(id, update);
 
@@ -380,7 +385,7 @@ export class MemStorage implements IStorage {
       userId,
       points,
       activity,
-      description,
+      description: description || null,
       createdAt: new Date()
     });
   }

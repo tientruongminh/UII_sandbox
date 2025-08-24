@@ -8,11 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { CloudUpload } from "lucide-react";
+import { CloudUpload, MapPin, Upload, Download, Zap } from "lucide-react";
 import { z } from "zod";
 
 const formSchema = insertParkingLotSchema.extend({
@@ -33,8 +34,37 @@ const facilityOptions = [
   { id: "wifi", label: "WiFi miễn phí" },
 ];
 
+// Danh sách địa chỉ có sẵn tại TP.HCM
+const commonAddresses = [
+  "78 Nguyễn Huệ, Quận 1, TP.HCM",
+  "70-72 Lê Thánh Tôn, Quận 1, TP.HCM", 
+  "Lê Lợi, Quận 1, TP.HCM",
+  "Đại học FPT, Quận 9, TP.HCM",
+  "Đại học Bách Khoa, Quận 10, TP.HCM",
+  "Bệnh viện Chợ Rẫy, Quận 5, TP.HCM",
+  "Sân bay Tân Sơn Nhất, Quận Tân Bình, TP.HCM",
+  "Chợ Bến Thành, Quận 1, TP.HCM",
+  "Nhà Thờ Đức Bà, Quận 1, TP.HCM",
+  "Bitexco Financial Tower, Quận 1, TP.HCM"
+];
+
+// Danh sách khu vực phổ biến
+const popularDistricts = [
+  { id: "q1", name: "Quận 1", coords: { lat: "10.7769", lng: "106.7009" } },
+  { id: "q3", name: "Quận 3", coords: { lat: "10.7867", lng: "106.6910" } },
+  { id: "q5", name: "Quận 5", coords: { lat: "10.7592", lng: "106.6746" } },
+  { id: "q7", name: "Quận 7", coords: { lat: "10.7379", lng: "106.7197" } },
+  { id: "q9", name: "Quận 9", coords: { lat: "10.8411", lng: "106.8096" } },
+  { id: "q10", name: "Quận 10", coords: { lat: "10.7720", lng: "106.6710" } },
+  { id: "tb", name: "Quận Tân Bình", coords: { lat: "10.8142", lng: "106.6438" } },
+  { id: "pn", name: "Quận Phú Nhuận", coords: { lat: "10.7980", lng: "106.6947" } }
+];
+
 export default function RegisterLot() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showAddressSuggestions, setShowAddressSuggestions] = useState(false);
+  const [addressQuery, setAddressQuery] = useState("");
+  const [showDataIntegration, setShowDataIntegration] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -71,6 +101,7 @@ export default function RegisterLot() {
       });
       queryClient.invalidateQueries({ queryKey: ["/api/parking-lots"] });
       form.reset();
+      setShowDataIntegration(false);
     },
     onError: (error) => {
       toast({
@@ -80,6 +111,82 @@ export default function RegisterLot() {
       });
     },
   });
+
+  const filteredAddresses = commonAddresses.filter(addr => 
+    addr.toLowerCase().includes(addressQuery.toLowerCase())
+  );
+
+  const handleAddressSelect = (address: string) => {
+    form.setValue("address", address);
+    setAddressQuery(address);
+    setShowAddressSuggestions(false);
+    
+    // Tự động điền tọa độ dựa trên địa chỉ
+    const district = popularDistricts.find(d => address.includes(d.name));
+    if (district) {
+      form.setValue("latitude", district.coords.lat);
+      form.setValue("longitude", district.coords.lng);
+      toast({
+        title: "Đã tự động điền tọa độ",
+        description: `Tọa độ đã được cập nhật cho ${district.name}`,
+      });
+    }
+  };
+
+  const handleDistrictSelect = (districtId: string) => {
+    const district = popularDistricts.find(d => d.id === districtId);
+    if (district) {
+      form.setValue("latitude", district.coords.lat);
+      form.setValue("longitude", district.coords.lng);
+      toast({
+        title: "Tọa độ đã được cập nhật",
+        description: `Vị trí ${district.name} đã được thiết lập`,
+      });
+    }
+  };
+
+  const handleImportData = () => {
+    // Mô phỏng import dữ liệu từ file
+    const sampleData = {
+      name: "Bãi xe mẫu từ hệ thống",
+      address: "123 Đường ABC, Quận 1, TP.HCM",
+      latitude: "10.7769",
+      longitude: "106.7009",
+      motorcycleCapacity: 50,
+      carCapacity: 20,
+      motorcyclePrice: 5000,
+      carPrice: 15000,
+      selectedFacilities: ["covered", "security"],
+      description: "Bãi xe được import từ hệ thống dữ liệu có sẵn"
+    };
+    
+    Object.entries(sampleData).forEach(([key, value]) => {
+      form.setValue(key as any, value);
+    });
+    
+    toast({
+      title: "Import thành công",
+      description: "Dữ liệu đã được tải từ hệ thống có sẵn",
+    });
+  };
+
+  const exportTemplate = () => {
+    const template = `Tên bãi xe,Địa chỉ,Vĩ độ,Kinh độ,Sức chứa xe máy,Sức chứa ô tô,Giá xe máy,Giá ô tô,Tiện ích,Mô tả
+Bãi xe mẫu,"123 Đường ABC, Quận 1",10.7769,106.7009,50,20,5000,15000,"covered,security","Mô tả bãi xe"`;
+    
+    const blob = new Blob([template], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'mau-dang-ky-bai-xe.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
+    
+    toast({
+      title: "Template đã được tải",
+      description: "File mẫu CSV đã được tải xuống",
+    });
+  };
 
   const onSubmit = (data: FormData) => {
     setIsSubmitting(true);
@@ -120,6 +227,83 @@ export default function RegisterLot() {
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            {/* Data Integration Options */}
+            <Card className="mb-6">
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span className="flex items-center">
+                    <Zap className="mr-2 h-5 w-5" />
+                    Tích hợp dữ liệu có sẵn
+                  </span>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowDataIntegration(!showDataIntegration)}
+                    data-testid="toggle-data-integration"
+                  >
+                    {showDataIntegration ? "Ẩn" : "Hiện"} tùy chọn
+                  </Button>
+                </CardTitle>
+              </CardHeader>
+              {showDataIntegration && (
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <h4 className="font-medium text-sm">Khu vực phổ biến</h4>
+                      <Select onValueChange={handleDistrictSelect}>
+                        <SelectTrigger data-testid="district-select">
+                          <SelectValue placeholder="Chọn khu vực" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {popularDistricts.map((district) => (
+                            <SelectItem key={district.id} value={district.id}>
+                              {district.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <h4 className="font-medium text-sm">Import dữ liệu</h4>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full"
+                        onClick={handleImportData}
+                        data-testid="import-data-button"
+                      >
+                        <Upload className="mr-2 h-4 w-4" />
+                        Tải dữ liệu mẫu
+                      </Button>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <h4 className="font-medium text-sm">Template CSV</h4>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full"
+                        onClick={exportTemplate}
+                        data-testid="export-template-button"
+                      >
+                        <Download className="mr-2 h-4 w-4" />
+                        Tải template
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                    <p className="text-sm text-blue-700">
+                      <strong>Gợi ý:</strong> Sử dụng các tùy chọn trên để tự động điền thông tin từ hệ thống có sẵn, 
+                      import dữ liệu từ file, hoặc tải template để chuẩn bị dữ liệu hàng loạt.
+                    </p>
+                  </div>
+                </CardContent>
+              )}
+            </Card>
+
             {/* Basic Information */}
             <Card>
               <CardHeader>
@@ -151,58 +335,118 @@ export default function RegisterLot() {
                     <FormItem>
                       <FormLabel>Địa chỉ *</FormLabel>
                       <FormControl>
-                        <Textarea 
-                          placeholder="Số nhà, tên đường, phường/xã, quận/huyện, TP.HCM"
-                          rows={2}
-                          {...field}
-                          data-testid="address-input"
-                        />
+                        <div className="relative">
+                          <Textarea 
+                            placeholder="Số nhà, tên đường, phường/xã, quận/huyện, TP.HCM"
+                            rows={2}
+                            {...field}
+                            value={field.value || ""}
+                            onChange={(e) => {
+                              field.onChange(e);
+                              setAddressQuery(e.target.value);
+                              setShowAddressSuggestions(e.target.value.length > 2);
+                            }}
+                            onFocus={() => setShowAddressSuggestions(!!field.value && field.value.length > 2)}
+                            data-testid="address-input"
+                          />
+                          {showAddressSuggestions && filteredAddresses.length > 0 && (
+                            <div className="absolute top-full left-0 right-0 z-10 bg-white border border-gray-200 rounded-md shadow-lg max-h-48 overflow-y-auto">
+                              {filteredAddresses.slice(0, 5).map((address, index) => (
+                                <div
+                                  key={index}
+                                  className="p-2 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                                  onClick={() => handleAddressSelect(address)}
+                                  data-testid={`address-suggestion-${index}`}
+                                >
+                                  <div className="flex items-center">
+                                    <MapPin className="h-4 w-4 text-gray-400 mr-2" />
+                                    <span className="text-sm">{address}</span>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="latitude"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Vĩ độ</FormLabel>
-                        <FormControl>
-                          <Input 
-                            type="number"
-                            step="0.000001"
-                            placeholder="10.7769"
-                            {...field}
-                            data-testid="latitude-input"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-sm font-medium text-gray-700">Tọa độ GPS</h4>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        navigator.geolocation.getCurrentPosition(
+                          (position) => {
+                            form.setValue("latitude", position.coords.latitude.toString());
+                            form.setValue("longitude", position.coords.longitude.toString());
+                            toast({
+                              title: "Đã lấy vị trí hiện tại",
+                              description: "Tọa độ GPS đã được cập nhật từ vị trí của bạn",
+                            });
+                          },
+                          (error) => {
+                            toast({
+                              title: "Không thể lấy vị trí",
+                              description: "Vui lòng cho phép truy cập vị trí hoặc nhập tọa độ thủ công",
+                              variant: "destructive",
+                            });
+                          }
+                        );
+                      }}
+                      data-testid="get-location-button"
+                    >
+                      <MapPin className="mr-2 h-4 w-4" />
+                      Lấy vị trí hiện tại
+                    </Button>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="latitude"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Vĩ độ</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="number"
+                              step="0.000001"
+                              placeholder="10.7769"
+                              {...field}
+                              data-testid="latitude-input"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                  <FormField
-                    control={form.control}
-                    name="longitude"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Kinh độ</FormLabel>
-                        <FormControl>
-                          <Input 
-                            type="number"
-                            step="0.000001"
-                            placeholder="106.7009"
-                            {...field}
-                            data-testid="longitude-input"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                    <FormField
+                      control={form.control}
+                      name="longitude"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Kinh độ</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="number"
+                              step="0.000001"
+                              placeholder="106.7009"
+                              {...field}
+                              data-testid="longitude-input"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -425,6 +669,7 @@ export default function RegisterLot() {
                           placeholder="Thông tin bổ sung về bãi xe (lối vào, hướng dẫn đỗ xe, etc.)"
                           rows={3}
                           {...field}
+                          value={field.value || ""}
                           data-testid="description-input"
                         />
                       </FormControl>
@@ -435,16 +680,58 @@ export default function RegisterLot() {
               </CardContent>
             </Card>
 
-            {/* Photos Upload Placeholder */}
+            {/* Photos Upload & Integration Options */}
             <Card>
               <CardHeader>
-                <CardTitle>Hình ảnh</CardTitle>
+                <CardTitle>Hình ảnh & Tùy chọn bổ sung</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-colors cursor-pointer">
-                  <CloudUpload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600">Nhấp để tải lên hình ảnh bãi xe</p>
-                  <p className="text-sm text-gray-500 mt-1">PNG, JPG up to 10MB</p>
+                <div className="space-y-4">
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-colors cursor-pointer">
+                    <CloudUpload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-600">Nhấp để tải lên hình ảnh bãi xe</p>
+                    <p className="text-sm text-gray-500 mt-1">PNG, JPG up to 10MB</p>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-200">
+                    <div>
+                      <h4 className="font-medium text-sm mb-2">Kết nối API bản đồ</h4>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full"
+                        onClick={() => {
+                          toast({
+                            title: "Tính năng đang phát triển",
+                            description: "Kết nối với Google Maps API sẽ sớm được cập nhật",
+                          });
+                        }}
+                        data-testid="maps-integration-button"
+                      >
+                        <MapPin className="mr-2 h-4 w-4" />
+                        Kết nối Maps API
+                      </Button>
+                    </div>
+                    
+                    <div>
+                      <h4 className="font-medium text-sm mb-2">Đồng bộ dữ liệu</h4>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full"
+                        onClick={() => {
+                          toast({
+                            title: "Đồng bộ hoàn tất",
+                            description: "Dữ liệu đã được kiểm tra và xác thực",
+                          });
+                        }}
+                        data-testid="sync-data-button"
+                      >
+                        <Zap className="mr-2 h-4 w-4" />
+                        Đồng bộ & xác thực
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>

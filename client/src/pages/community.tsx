@@ -112,9 +112,9 @@ export default function Community() {
   ];
 
   const mockStats = {
-    todayUpdates: communityUpdates.length,
+    todayUpdates: (communityUpdates as CommunityUpdate[]).length,
     activeMembers: 1234,
-    registeredLots: parkingLots.length,
+    registeredLots: (parkingLots as ParkingLot[]).length,
   };
 
   if (isLoading) {
@@ -150,7 +150,7 @@ export default function Community() {
                     <SelectValue placeholder="Chọn bãi xe để cập nhật" />
                   </SelectTrigger>
                   <SelectContent>
-                    {parkingLots.map((lot: ParkingLot) => (
+                    {(parkingLots as ParkingLot[]).map((lot: ParkingLot) => (
                       <SelectItem key={lot.id} value={lot.id}>
                         {lot.name}
                       </SelectItem>
@@ -206,7 +206,7 @@ export default function Community() {
             <div className="space-y-4">
               <h2 className="text-lg font-semibold text-gray-900">Cập nhật gần đây</h2>
               
-              {communityUpdates.length === 0 ? (
+              {(communityUpdates as CommunityUpdate[]).length === 0 ? (
                 <Card>
                   <CardContent className="text-center py-8">
                     <Users className="h-12 w-12 mx-auto mb-4 text-gray-300" />
@@ -216,8 +216,8 @@ export default function Community() {
                 </Card>
               ) : (
                 <div className="space-y-4" data-testid="updates-feed">
-                  {communityUpdates.map((update: CommunityUpdate) => {
-                    const lot = parkingLots.find((l: ParkingLot) => l.id === update.parkingLotId);
+                  {(communityUpdates as CommunityUpdate[]).map((update: CommunityUpdate) => {
+                    const lot = (parkingLots as ParkingLot[]).find((l: ParkingLot) => l.id === update.parkingLotId);
                     return (
                       <Card key={update.id} data-testid={`update-${update.id}`}>
                         <CardContent className="p-4">
