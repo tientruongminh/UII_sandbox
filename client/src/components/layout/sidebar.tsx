@@ -1,5 +1,6 @@
 import { Link, useLocation } from "wouter";
-import { Home, Search, PlusCircle, Users, Gift, Car } from "lucide-react";
+import { Home, Search, PlusCircle, Users, Gift } from "lucide-react";
+import parkingHubLogo from "@assets/parking-hub-logo.png";
 
 interface SidebarProps {
   currentUser: {
@@ -27,8 +28,13 @@ export default function Sidebar({ currentUser }: SidebarProps) {
     <aside className="hidden md:flex md:flex-col md:w-64 bg-white border-r border-gray-200" data-testid="sidebar">
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center space-x-3">
-          <Car className="text-primary text-2xl" data-testid="logo-icon" />
-          <h1 className="text-xl font-bold text-gray-900" data-testid="app-title">ParkFinder</h1>
+          <img 
+            src={parkingHubLogo} 
+            alt="Parking Hub Logo" 
+            className="w-8 h-8" 
+            data-testid="logo-icon" 
+          />
+          <h1 className="text-xl font-bold text-gray-900" data-testid="app-title">Parking Hub</h1>
         </div>
         <p className="text-sm text-gray-500 mt-1">Tìm bãi giữ xe TP.HCM</p>
       </div>

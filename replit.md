@@ -1,6 +1,6 @@
 # Overview
 
-ParkFinder is a comprehensive parking management system designed for Ho Chi Minh City that connects parking lot owners with users seeking parking spaces. The application features real-time parking availability tracking, community-driven updates, a rewards system for user engagement, and advanced search capabilities. Built as a full-stack web application, it serves both motorcycle and car parking needs with location-based services and pricing transparency.
+Parking Hub is a comprehensive parking management system designed for Ho Chi Minh City that connects parking lot owners with users seeking parking spaces. The application features real-time parking availability tracking, community-driven updates, a rewards system for user engagement, and advanced search capabilities. Built as a full-stack web application, it serves both motorcycle and car parking needs with location-based services and pricing transparency.
 
 # User Preferences
 
