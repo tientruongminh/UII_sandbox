@@ -106,3 +106,10 @@
     "bufferutil": "^4.0.8"
   }
 }
+// package.json
+{
+  "scripts": {
+    "build": "vite build"   // hoặc "react-scripts build", "next build", tùy framework
+  }
+}
+
