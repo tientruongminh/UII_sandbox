@@ -12,6 +12,7 @@ import Community from "@/pages/community";
 import Rewards from "@/pages/rewards";
 import Sidebar from "@/components/layout/sidebar";
 import MobileNav from "@/components/layout/mobile-nav";
+import 'leaflet/dist/leaflet.css';
 
 function Router() {
   return (

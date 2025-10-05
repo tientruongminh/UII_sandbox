@@ -49,19 +49,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/parking-lots", async (req, res) => {
-    try {
-      const data = insertParkingLotSchema.parse(req.body);
-      const lot = await storage.createParkingLot(data);
-      
-      // Award points for registering new parking lot
-      await storage.addPoints(data.ownerId, 50, "register_lot", "Đăng ký bãi xe mới");
-      
-      res.status(201).json(lot);
-    } catch (error) {
-      res.status(400).json({ message: "Invalid data", error });
-    }
-  });
+ app.get("/api/parking-lots", async (req, res) => {
+  try {
+    const lots = await storage.getParkingLots();
+    
+    // Transform latitude/longitude thành lat/lng (number)
+    const transformed = lots.map(lot => ({
+      ...lot,
+      lat: parseFloat(lot.latitude),
+      lng: parseFloat(lot.longitude)
+    }));
+    
+    res.json(transformed);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch parking lots" });
+  }
+});
 
   // Reviews
   app.get("/api/parking-lots/:id/reviews", async (req, res) => {

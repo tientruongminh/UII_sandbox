@@ -1,0 +1,1265 @@
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParkFinder - Tìm Bãi Giữ Xe TP.HCM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#2563EB',
+                        'primary-dark': '#1D4ED8',
+                        'primary-light': '#3B82F6',
+                        success: '#10B981',
+                        danger: '#EF4444',
+                        warning: '#F59E0B',
+                        'gray-50': '#F9FAFB',
+                        'gray-100': '#F3F4F6',
+                        'gray-200': '#E5E7EB',
+                        'gray-300': '#D1D5DB',
+                        'gray-400': '#9CA3AF',
+                        'gray-500': '#6B7280',
+                        'gray-600': '#4B5563',
+                        'gray-700': '#374151',
+                        'gray-800': '#1F2937',
+                        'gray-900': '#111827',
+                    }
+                }
+            }
+        };
+    </script>
+</head>
+<body class="font-inter bg-gray-50 text-gray-900">
+    <!-- @COMPONENT: MainApp [main application container] -->
+    <div id="app" class="min-h-screen">
+        <!-- Mobile Navigation Header -->
+        <header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50 md:hidden">
+            <div class="px-4 py-3 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-parking text-primary text-xl"></i>
+                    <h1 class="text-lg font-semibold text-gray-900">ParkFinder</h1>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button class="relative p-2 text-gray-600 hover:text-primary" data-event="click:showNotifications">
+                        <i class="fas fa-bell"></i>
+                        <span class="absolute -top-1 -right-1 bg-danger text-white text-xs rounded-full h-5 w-5 flex items-center justify-center" data-mock="true">3</span>
+                    </button>
+                    <button class="p-2 text-gray-600 hover:text-primary" data-event="click:showProfile">
+                        <i class="fas fa-user-circle text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex min-h-screen">
+            <!-- Desktop Sidebar -->
+            <aside class="hidden md:flex md:flex-col md:w-64 bg-white border-r border-gray-200">
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex items-center space-x-3">
+                        <i class="fas fa-parking text-primary text-2xl"></i>
+                        <h1 class="text-xl font-bold text-gray-900">ParkFinder</h1>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-1">Tìm bãi giữ xe TP.HCM</p>
+                </div>
+                
+                <nav class="flex-1 p-4">
+                    <ul class="space-y-2">
+                        <li>
+                            <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg bg-primary text-white" data-page="home">
+                                <i class="fas fa-home"></i>
+                                <span>Trang chủ</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100" data-page="search">
+                                <i class="fas fa-search"></i>
+                                <span>Tìm kiếm</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100" data-page="register-lot">
+                                <i class="fas fa-plus-circle"></i>
+                                <span>Đăng ký bãi xe</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100" data-page="community">
+                                <i class="fas fa-users"></i>
+                                <span>Cộng đồng</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100" data-page="rewards">
+                                <i class="fas fa-gift"></i>
+                                <span>Điểm thưởng</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+
+                <div class="p-4 border-t border-gray-200">
+                    <div class="flex items-center space-x-3 p-3 rounded-lg bg-gray-50">
+                        <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-semibold" data-mock="true">
+                            <span data-bind="user.initials">NV</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-gray-900 truncate" data-bind="user.name" data-mock="true">Nguyễn Văn A</p>
+                            <p class="text-xs text-primary" data-bind="user.points" data-mock="true">1,250 điểm</p>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Content Area -->
+            <main class="flex-1 flex flex-col min-h-screen">
+                <!-- Home Page -->
+                <div id="home-page" class="flex-1 flex flex-col">
+                    <!-- Search Bar -->
+                    <div class="bg-white border-b border-gray-200 p-4">
+                        <div class="max-w-4xl mx-auto">
+                            <div class="relative">
+                                <input type="text" 
+                                       placeholder="Tìm kiếm địa chỉ hoặc địa điểm..."
+                                       class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                       data-event="input:handleSearch">
+                                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            </div>
+                            
+                            <!-- Quick Filters -->
+                            <div class="flex items-center space-x-3 mt-3 overflow-x-auto pb-2">
+                                <button class="flex items-center space-x-2 px-3 py-1.5 bg-primary text-white rounded-full text-sm whitespace-nowrap" data-filter="nearby">
+                                    <i class="fas fa-location-arrow text-xs"></i>
+                                    <span>Gần tôi</span>
+                                </button>
+                                <button class="flex items-center space-x-2 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-sm whitespace-nowrap" data-filter="available">
+                                    <i class="fas fa-circle text-success text-xs"></i>
+                                    <span>Còn chỗ</span>
+                                </button>
+                                <button class="flex items-center space-x-2 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-sm whitespace-nowrap" data-filter="motorcycle">
+                                    <i class="fas fa-motorcycle text-xs"></i>
+                                    <span>Xe máy</span>
+                                </button>
+                                <button class="flex items-center space-x-2 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-sm whitespace-nowrap" data-filter="car">
+                                    <i class="fas fa-car text-xs"></i>
+                                    <span>Ô tô</span>
+                                </button>
+                                <button class="flex items-center space-x-2 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-sm whitespace-nowrap" data-event="click:showAdvancedFilters">
+                                    <i class="fas fa-sliders-h text-xs"></i>
+                                    <span>Bộ lọc</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex-1 flex flex-col md:flex-row">
+                        <!-- Map Area -->
+                        <div class="relative flex-1 h-64 md:h-auto">
+                            <!-- Simple Map Mockup -->
+                            <!-- A satellite view of Ho Chi Minh City with parking lots marked -->
+                            <div class="w-full h-full bg-cover bg-center relative" 
+                                 style="background-image: url('https://images.unsplash.com/photo-1583417319070-4a69db38a482?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1200&h=800');">
+                                
+                                <!-- Map Overlay -->
+                                <div class="absolute inset-0 bg-blue-900 bg-opacity-20"></div>
+                                
+                                <!-- Parking Lot Markers -->
+                                <div class="absolute top-1/4 left-1/3 transform -translate-x-1/2 -translate-y-1/2">
+                                    <div class="bg-success text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-semibold shadow-lg cursor-pointer transform hover:scale-110 transition-transform" data-event="click:showParkingDetails" data-lot-id="1">
+                                        <i class="fas fa-parking text-xs"></i>
+                                    </div>
+                                    <div class="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 bg-white px-2 py-1 rounded shadow-lg text-xs whitespace-nowrap" data-mock="true">
+                                        Bãi xe Nguyễn Huệ
+                                    </div>
+                                </div>
+
+                                <div class="absolute top-1/2 left-2/3 transform -translate-x-1/2 -translate-y-1/2">
+                                    <div class="bg-danger text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-semibold shadow-lg cursor-pointer transform hover:scale-110 transition-transform" data-event="click:showParkingDetails" data-lot-id="2">
+                                        <i class="fas fa-parking text-xs"></i>
+                                    </div>
+                                    <div class="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 bg-white px-2 py-1 rounded shadow-lg text-xs whitespace-nowrap" data-mock="true">
+                                        Bãi xe Vincom
+                                    </div>
+                                </div>
+
+                                <div class="absolute top-3/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                                    <div class="bg-success text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-semibold shadow-lg cursor-pointer transform hover:scale-110 transition-transform" data-event="click:showParkingDetails" data-lot-id="3">
+                                        <i class="fas fa-parking text-xs"></i>
+                                    </div>
+                                    <div class="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 bg-white px-2 py-1 rounded shadow-lg text-xs whitespace-nowrap" data-mock="true">
+                                        Bãi xe Bến Thành
+                                    </div>
+                                </div>
+
+                                <!-- Current Location -->
+                                <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                                    <div class="bg-primary text-white rounded-full w-6 h-6 flex items-center justify-center shadow-lg animate-pulse">
+                                        <i class="fas fa-dot-circle text-xs"></i>
+                                    </div>
+                                </div>
+
+                                <!-- Map Controls -->
+                                <div class="absolute top-4 right-4 flex flex-col space-y-2">
+                                    <button class="bg-white p-2 rounded-lg shadow-lg text-gray-600 hover:text-primary" data-event="click:zoomIn">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                    <button class="bg-white p-2 rounded-lg shadow-lg text-gray-600 hover:text-primary" data-event="click:zoomOut">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <button class="bg-white p-2 rounded-lg shadow-lg text-gray-600 hover:text-primary" data-event="click:centerLocation">
+                                        <i class="fas fa-crosshairs"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Parking Lots List (Mobile) / Sidebar (Desktop) -->
+                        <div class="md:w-80 bg-white border-t md:border-t-0 md:border-l border-gray-200 flex flex-col">
+                            <div class="p-4 border-b border-gray-200">
+                                <h2 class="text-lg font-semibold text-gray-900">Bãi xe gần bạn</h2>
+                                <p class="text-sm text-gray-500" data-mock="true">Tìm thấy 12 bãi xe trong bán kính 2km</p>
+                            </div>
+
+                            <div class="flex-1 overflow-y-auto">
+                                <!-- @MAP: parkingLots.map(lot => ( -->
+                                
+                                <!-- Parking Lot Card 1 -->
+                                <div class="p-4 border-b border-gray-200 hover:bg-gray-50 cursor-pointer transition-colors" data-event="click:showParkingDetails" data-lot-id="1">
+                                    <div class="flex items-start space-x-3">
+                                        <div class="flex-shrink-0">
+                                            <div class="w-12 h-12 bg-success rounded-lg flex items-center justify-center text-white">
+                                                <i class="fas fa-parking"></i>
+                                            </div>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="flex items-center justify-between">
+                                                <h3 class="text-sm font-medium text-gray-900 truncate" data-mock="true">Bãi xe Nguyễn Huệ</h3>
+                                                <span class="text-xs text-success font-medium" data-mock="true">Còn chỗ</span>
+                                            </div>
+                                            <p class="text-xs text-gray-500 mt-1" data-mock="true">78 Nguyễn Huệ, Q1, TP.HCM</p>
+                                            <div class="flex items-center justify-between mt-2">
+                                                <div class="flex items-center space-x-2 text-xs text-gray-600">
+                                                    <i class="fas fa-motorcycle"></i>
+                                                    <span data-mock="true">5,000 VNĐ/giờ</span>
+                                                </div>
+                                                <div class="flex items-center space-x-1 text-xs text-gray-600">
+                                                    <i class="fas fa-location-arrow"></i>
+                                                    <span data-mock="true">150m</span>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center mt-2">
+                                                <div class="flex items-center space-x-1">
+                                                    <i class="fas fa-star text-warning text-xs"></i>
+                                                    <span class="text-xs text-gray-600" data-mock="true">4.8 (24 đánh giá)</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Parking Lot Card 2 -->
+                                <div class="p-4 border-b border-gray-200 hover:bg-gray-50 cursor-pointer transition-colors" data-event="click:showParkingDetails" data-lot-id="2">
+                                    <div class="flex items-start space-x-3">
+                                        <div class="flex-shrink-0">
+                                            <div class="w-12 h-12 bg-danger rounded-lg flex items-center justify-center text-white">
+                                                <i class="fas fa-parking"></i>
+                                            </div>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="flex items-center justify-between">
+                                                <h3 class="text-sm font-medium text-gray-900 truncate" data-mock="true">Bãi xe Vincom Center</h3>
+                                                <span class="text-xs text-danger font-medium" data-mock="true">Hết chỗ</span>
+                                            </div>
+                                            <p class="text-xs text-gray-500 mt-1" data-mock="true">70-72 Lê Thánh Tôn, Q1, TP.HCM</p>
+                                            <div class="flex items-center justify-between mt-2">
+                                                <div class="flex items-center space-x-2 text-xs text-gray-600">
+                                                    <i class="fas fa-car"></i>
+                                                    <span data-mock="true">15,000 VNĐ/giờ</span>
+                                                </div>
+                                                <div class="flex items-center space-x-1 text-xs text-gray-600">
+                                                    <i class="fas fa-location-arrow"></i>
+                                                    <span data-mock="true">300m</span>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center mt-2">
+                                                <div class="flex items-center space-x-1">
+                                                    <i class="fas fa-star text-warning text-xs"></i>
+                                                    <span class="text-xs text-gray-600" data-mock="true">4.5 (156 đánh giá)</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Parking Lot Card 3 -->
+                                <div class="p-4 border-b border-gray-200 hover:bg-gray-50 cursor-pointer transition-colors" data-event="click:showParkingDetails" data-lot-id="3">
+                                    <div class="flex items-start space-x-3">
+                                        <div class="flex-shrink-0">
+                                            <div class="w-12 h-12 bg-success rounded-lg flex items-center justify-center text-white">
+                                                <i class="fas fa-parking"></i>
+                                            </div>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <div class="flex items-center justify-between">
+                                                <h3 class="text-sm font-medium text-gray-900 truncate" data-mock="true">Bãi xe Chợ Bến Thành</h3>
+                                                <span class="text-xs text-success font-medium" data-mock="true">Còn chỗ</span>
+                                            </div>
+                                            <p class="text-xs text-gray-500 mt-1" data-mock="true">Lê Lợi, Q1, TP.HCM</p>
+                                            <div class="flex items-center justify-between mt-2">
+                                                <div class="flex items-center space-x-2 text-xs text-gray-600">
+                                                    <i class="fas fa-motorcycle"></i>
+                                                    <span data-mock="true">3,000 VNĐ/giờ</span>
+                                                </div>
+                                                <div class="flex items-center space-x-1 text-xs text-gray-600">
+                                                    <i class="fas fa-location-arrow"></i>
+                                                    <span data-mock="true">450m</span>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center mt-2">
+                                                <div class="flex items-center space-x-1">
+                                                    <i class="fas fa-star text-warning text-xs"></i>
+                                                    <span class="text-xs text-gray-600" data-mock="true">4.2 (89 đánh giá)</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- @END_MAP )) -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Parking Lot Detail Modal -->
+                <div id="parking-detail-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden" data-event="click:closeParkingDetail">
+                    <div class="flex items-end md:items-center justify-center min-h-screen p-4">
+                        <div class="bg-white rounded-t-xl md:rounded-xl w-full max-w-md max-h-[90vh] overflow-y-auto" data-event="click:stopPropagation">
+                            <!-- Header -->
+                            <div class="p-4 border-b border-gray-200 flex items-center justify-between">
+                                <h2 class="text-lg font-semibold text-gray-900" data-mock="true">Bãi xe Nguyễn Huệ</h2>
+                                <button class="p-2 text-gray-400 hover:text-gray-600" data-event="click:closeParkingDetail">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+
+                            <!-- Content -->
+                            <div class="p-4 space-y-4">
+                                <!-- Status Badge -->
+                                <div class="flex items-center justify-between">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-success-100 text-success-800" data-mock="true">
+                                        <i class="fas fa-circle text-xs mr-2"></i>
+                                        Còn chỗ trống
+                                    </span>
+                                    <div class="text-sm text-gray-500" data-mock="true">
+                                        Cập nhật 5 phút trước
+                                    </div>
+                                </div>
+
+                                <!-- Address -->
+                                <div class="flex items-start space-x-3">
+                                    <i class="fas fa-map-marker-alt text-gray-400 mt-1"></i>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900" data-mock="true">78 Nguyễn Huệ, Quận 1, TP.HCM</p>
+                                        <p class="text-xs text-gray-500" data-mock="true">Cách bạn 150m (2 phút đi bộ)</p>
+                                    </div>
+                                </div>
+
+                                <!-- Pricing -->
+                                <div class="bg-gray-50 rounded-lg p-3">
+                                    <h3 class="text-sm font-medium text-gray-900 mb-2">Giá cả</h3>
+                                    <div class="space-y-2">
+                                        <div class="flex items-center justify-between text-sm">
+                                            <span class="flex items-center space-x-2">
+                                                <i class="fas fa-motorcycle text-gray-400"></i>
+                                                <span>Xe máy</span>
+                                            </span>
+                                            <span class="font-medium" data-mock="true">5,000 VNĐ/giờ</span>
+                                        </div>
+                                        <div class="flex items-center justify-between text-sm">
+                                            <span class="flex items-center space-x-2">
+                                                <i class="fas fa-car text-gray-400"></i>
+                                                <span>Ô tô</span>
+                                            </span>
+                                            <span class="font-medium" data-mock="true">15,000 VNĐ/giờ</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Capacity -->
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-gray-600">Sức chứa</span>
+                                    <span class="text-sm font-medium" data-mock="true">50 xe máy, 20 ô tô</span>
+                                </div>
+
+                                <!-- Rating -->
+                                <div class="flex items-center space-x-2">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                    </div>
+                                    <span class="text-sm text-gray-600" data-mock="true">4.8 (24 đánh giá)</span>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="space-y-3 pt-2">
+                                    <button class="w-full bg-primary text-white py-3 rounded-lg font-medium hover:bg-primary-dark transition-colors" data-event="click:navigateToParking">
+                                        <i class="fas fa-directions mr-2"></i>
+                                        Chỉ đường đến bãi xe
+                                    </button>
+                                    
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <button class="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50" data-event="click:reportStatus">
+                                            <i class="fas fa-flag mr-2"></i>
+                                            Báo cáo
+                                        </button>
+                                        <button class="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50" data-event="click:shareParking">
+                                            <i class="fas fa-share mr-2"></i>
+                                            Chia sẻ
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Recent Comments -->
+                                <div class="border-t border-gray-200 pt-4">
+                                    <h3 class="text-sm font-medium text-gray-900 mb-3">Đánh giá gần đây</h3>
+                                    <div class="space-y-3">
+                                        <div class="text-sm" data-mock="true">
+                                            <div class="flex items-center space-x-2 mb-1">
+                                                <span class="font-medium">Minh Tuấn</span>
+                                                <div class="flex items-center">
+                                                    <i class="fas fa-star text-warning text-xs"></i>
+                                                    <i class="fas fa-star text-warning text-xs"></i>
+                                                    <i class="fas fa-star text-warning text-xs"></i>
+                                                    <i class="fas fa-star text-warning text-xs"></i>
+                                                    <i class="fas fa-star text-warning text-xs"></i>
+                                                </div>
+                                            </div>
+                                            <p class="text-gray-600">Bãi xe rộng, dễ tìm. Giá hợp lý cho khu vực trung tâm.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advanced Search Page -->
+                <div id="search-page" class="hidden flex-1 bg-white">
+                    <div class="max-w-4xl mx-auto p-4">
+                        <div class="mb-6">
+                            <h1 class="text-2xl font-bold text-gray-900">Tìm kiếm nâng cao</h1>
+                            <p class="text-gray-600 mt-1">Tìm bãi xe phù hợp với nhu cầu của bạn</p>
+                        </div>
+
+                        <!-- Advanced Filters -->
+                        <div class="bg-white border border-gray-200 rounded-lg p-6 mb-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                <!-- Distance Filter -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Khoảng cách</label>
+                                    <select class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:border-transparent">
+                                        <option>Trong 500m</option>
+                                        <option selected>Trong 1km</option>
+                                        <option>Trong 2km</option>
+                                        <option>Trong 5km</option>
+                                    </select>
+                                </div>
+
+                                <!-- Price Range -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Giá cả (VNĐ/giờ)</label>
+                                    <select class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:border-transparent">
+                                        <option>Dưới 5,000</option>
+                                        <option selected>5,000 - 10,000</option>
+                                        <option>10,000 - 20,000</option>
+                                        <option>Trên 20,000</option>
+                                    </select>
+                                </div>
+
+                                <!-- Vehicle Type -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Loại xe</label>
+                                    <div class="space-y-2">
+                                        <label class="flex items-center">
+                                            <input type="checkbox" checked class="rounded border-gray-300 text-primary focus:ring-primary">
+                                            <span class="ml-2 text-sm text-gray-700">Xe máy</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="rounded border-gray-300 text-primary focus:ring-primary">
+                                            <span class="ml-2 text-sm text-gray-700">Ô tô</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Availability -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Tình trạng</label>
+                                    <select class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:border-transparent">
+                                        <option>Tất cả</option>
+                                        <option selected>Còn chỗ</option>
+                                        <option>Sắp hết chỗ</option>
+                                    </select>
+                                </div>
+
+                                <!-- Facilities -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Tiện ích</label>
+                                    <div class="space-y-2">
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="rounded border-gray-300 text-primary focus:ring-primary">
+                                            <span class="ml-2 text-sm text-gray-700">Có mái che</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="rounded border-gray-300 text-primary focus:ring-primary">
+                                            <span class="ml-2 text-sm text-gray-700">Bảo vệ 24/7</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Rating -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Đánh giá tối thiểu</label>
+                                    <select class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:border-transparent">
+                                        <option>Bất kỳ</option>
+                                        <option>3 sao trở lên</option>
+                                        <option selected>4 sao trở lên</option>
+                                        <option>5 sao</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center space-x-3 mt-6">
+                                <button class="bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-primary-dark transition-colors">
+                                    Áp dụng bộ lọc
+                                </button>
+                                <button class="text-gray-600 hover:text-gray-800">
+                                    Đặt lại
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Search Results -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- Results List -->
+                            <div class="space-y-4">
+                                <h2 class="text-lg font-semibold text-gray-900">Kết quả tìm kiếm</h2>
+                                <!-- Results would be populated here -->
+                                <div class="text-center py-12 text-gray-500">
+                                    <i class="fas fa-search text-4xl mb-4"></i>
+                                    <p>Nhập từ khóa để tìm kiếm bãi xe</p>
+                                </div>
+                            </div>
+
+                            <!-- Map View -->
+                            <div class="bg-gray-100 rounded-lg p-4 h-96">
+                                <div class="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center text-gray-500">
+                                    <div class="text-center">
+                                        <i class="fas fa-map text-4xl mb-4"></i>
+                                        <p>Bản đồ sẽ hiển thị kết quả tìm kiếm</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Register Parking Lot Page -->
+                <div id="register-lot-page" class="hidden flex-1 bg-white">
+                    <div class="max-w-2xl mx-auto p-4">
+                        <div class="mb-6">
+                            <h1 class="text-2xl font-bold text-gray-900">Đăng ký bãi xe</h1>
+                            <p class="text-gray-600 mt-1">Chia sẻ bãi xe của bạn với cộng đồng</p>
+                        </div>
+
+                        <form class="space-y-6 bg-white border border-gray-200 rounded-lg p-6">
+                            <!-- Basic Information -->
+                            <div>
+                                <h2 class="text-lg font-semibold text-gray-900 mb-4">Thông tin cơ bản</h2>
+                                
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Tên bãi xe *</label>
+                                        <input type="text" required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="VD: Bãi xe Nguyễn Văn A">
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Địa chỉ *</label>
+                                        <textarea required class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:border-transparent" rows="2" placeholder="Số nhà, tên đường, phường/xã, quận/huyện, TP.HCM"></textarea>
+                                    </div>
+
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Số điện thoại</label>
+                                            <input type="tel" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="0901234567">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                            <input type="email" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="email@example.com">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Capacity & Pricing -->
+                            <div>
+                                <h2 class="text-lg font-semibold text-gray-900 mb-4">Sức chứa & Giá cả</h2>
+                                
+                                <div class="space-y-4">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Số chỗ xe máy</label>
+                                            <input type="number" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="0">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Giá xe máy (VNĐ/giờ)</label>
+                                            <input type="number" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="5000">
+                                        </div>
+                                    </div>
+
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Số chỗ ô tô</label>
+                                            <input type="number" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="0">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Giá ô tô (VNĐ/giờ)</label>
+                                            <input type="number" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="15000">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Facilities -->
+                            <div>
+                                <h2 class="text-lg font-semibold text-gray-900 mb-4">Tiện ích</h2>
+                                <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="rounded border-gray-300 text-primary focus:ring-primary">
+                                        <span class="ml-2 text-sm text-gray-700">Có mái che</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="rounded border-gray-300 text-primary focus:ring-primary">
+                                        <span class="ml-2 text-sm text-gray-700">Bảo vệ 24/7</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="rounded border-gray-300 text-primary focus:ring-primary">
+                                        <span class="ml-2 text-sm text-gray-700">Camera an ninh</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="rounded border-gray-300 text-primary focus:ring-primary">
+                                        <span class="ml-2 text-sm text-gray-700">Toilet</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="rounded border-gray-300 text-primary focus:ring-primary">
+                                        <span class="ml-2 text-sm text-gray-700">Nước uống</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="rounded border-gray-300 text-primary focus:ring-primary">
+                                        <span class="ml-2 text-sm text-gray-700">WiFi miễn phí</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Photos -->
+                            <div>
+                                <h2 class="text-lg font-semibold text-gray-900 mb-4">Hình ảnh</h2>
+                                <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-colors cursor-pointer" data-implementation="File upload component">
+                                    <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
+                                    <p class="text-gray-600">Nhấp để tải lên hình ảnh bãi xe</p>
+                                    <p class="text-sm text-gray-500 mt-1">PNG, JPG up to 10MB</p>
+                                </div>
+                            </div>
+
+                            <!-- Operating Hours -->
+                            <div>
+                                <h2 class="text-lg font-semibold text-gray-900 mb-4">Giờ hoạt động</h2>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Giờ mở cửa</label>
+                                        <input type="time" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:border-transparent" value="06:00">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Giờ đóng cửa</label>
+                                        <input type="time" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:border-transparent" value="22:00">
+                                    </div>
+                                </div>
+                                <label class="flex items-center mt-3">
+                                    <input type="checkbox" class="rounded border-gray-300 text-primary focus:ring-primary">
+                                    <span class="ml-2 text-sm text-gray-700">Hoạt động 24/7</span>
+                                </label>
+                            </div>
+
+                            <!-- Additional Notes -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Ghi chú thêm</label>
+                                <textarea class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:border-transparent" rows="3" placeholder="Thông tin bổ sung về bãi xe (lối vào, hướng dẫn đỗ xe, etc.)"></textarea>
+                            </div>
+
+                            <!-- Submit Buttons -->
+                            <div class="flex items-center space-x-4 pt-6">
+                                <button type="submit" class="bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-dark transition-colors">
+                                    Đăng ký bãi xe
+                                </button>
+                                <button type="button" class="border border-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors">
+                                    Lưu nháp
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Community Page -->
+                <div id="community-page" class="hidden flex-1 bg-white">
+                    <div class="max-w-4xl mx-auto p-4">
+                        <div class="mb-6">
+                            <h1 class="text-2xl font-bold text-gray-900">Cộng đồng</h1>
+                            <p class="text-gray-600 mt-1">Cập nhật và chia sẻ thông tin bãi xe với mọi người</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <!-- Updates Feed -->
+                            <div class="lg:col-span-2">
+                                <!-- Quick Update -->
+                                <div class="bg-white border border-gray-200 rounded-lg p-4 mb-6">
+                                    <h2 class="text-lg font-semibold text-gray-900 mb-4">Cập nhật nhanh</h2>
+                                    <div class="space-y-3">
+                                        <select class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:border-transparent">
+                                            <option>Chọn bãi xe để cập nhật</option>
+                                            <option>Bãi xe Nguyễn Huệ</option>
+                                            <option>Bãi xe Vincom Center</option>
+                                            <option>Bãi xe Chợ Bến Thành</option>
+                                        </select>
+                                        
+                                        <div class="grid grid-cols-2 gap-3">
+                                            <button class="flex items-center justify-center px-4 py-2 bg-success text-white rounded-lg font-medium hover:bg-success-600 transition-colors">
+                                                <i class="fas fa-circle mr-2"></i>
+                                                Còn chỗ
+                                            </button>
+                                            <button class="flex items-center justify-center px-4 py-2 bg-danger text-white rounded-lg font-medium hover:bg-danger-600 transition-colors">
+                                                <i class="fas fa-circle mr-2"></i>
+                                                Hết chỗ
+                                            </button>
+                                        </div>
+                                        
+                                        <textarea class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:border-transparent" rows="2" placeholder="Thêm ghi chú (tùy chọn)"></textarea>
+                                        
+                                        <button class="w-full bg-primary text-white py-2 rounded-lg font-medium hover:bg-primary-dark transition-colors">
+                                            Gửi cập nhật
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Recent Updates -->
+                                <div class="space-y-4">
+                                    <h2 class="text-lg font-semibold text-gray-900">Cập nhật gần đây</h2>
+                                    
+                                    <!-- Update Item 1 -->
+                                    <div class="bg-white border border-gray-200 rounded-lg p-4" data-mock="true">
+                                        <div class="flex items-start space-x-3">
+                                            <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                                                MT
+                                            </div>
+                                            <div class="flex-1">
+                                                <div class="flex items-center space-x-2 mb-1">
+                                                    <span class="font-medium text-gray-900">Minh Tuấn</span>
+                                                    <span class="text-sm text-gray-500">5 phút trước</span>
+                                                </div>
+                                                <p class="text-sm text-gray-700 mb-2">Cập nhật tình trạng cho <strong>Bãi xe Nguyễn Huệ</strong></p>
+                                                <div class="flex items-center space-x-3">
+                                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-success-100 text-success-800">
+                                                        <i class="fas fa-circle text-xs mr-1"></i>
+                                                        Còn chỗ
+                                                    </span>
+                                                    <span class="text-xs text-gray-500">+10 điểm</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Update Item 2 -->
+                                    <div class="bg-white border border-gray-200 rounded-lg p-4" data-mock="true">
+                                        <div class="flex items-start space-x-3">
+                                            <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                                                HN
+                                            </div>
+                                            <div class="flex-1">
+                                                <div class="flex items-center space-x-2 mb-1">
+                                                    <span class="font-medium text-gray-900">Hải Nam</span>
+                                                    <span class="text-sm text-gray-500">15 phút trước</span>
+                                                </div>
+                                                <p class="text-sm text-gray-700 mb-2">Cập nhật tình trạng cho <strong>Bãi xe Vincom Center</strong></p>
+                                                <div class="flex items-center space-x-3">
+                                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-danger-100 text-danger-800">
+                                                        <i class="fas fa-circle text-xs mr-1"></i>
+                                                        Hết chỗ
+                                                    </span>
+                                                    <span class="text-xs text-gray-500">+10 điểm</span>
+                                                </div>
+                                                <p class="text-xs text-gray-600 mt-1">"Bãi xe đã đầy từ 30 phút trước"</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Update Item 3 -->
+                                    <div class="bg-white border border-gray-200 rounded-lg p-4" data-mock="true">
+                                        <div class="flex items-start space-x-3">
+                                            <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                                                TL
+                                            </div>
+                                            <div class="flex-1">
+                                                <div class="flex items-center space-x-2 mb-1">
+                                                    <span class="font-medium text-gray-900">Thu Linh</span>
+                                                    <span class="text-sm text-gray-500">1 giờ trước</span>
+                                                </div>
+                                                <p class="text-sm text-gray-700 mb-2">Đăng ký bãi xe mới: <strong>Bãi xe Café ABC</strong></p>
+                                                <div class="flex items-center space-x-3">
+                                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary-100 text-primary-800">
+                                                        <i class="fas fa-plus text-xs mr-1"></i>
+                                                        Bãi xe mới
+                                                    </span>
+                                                    <span class="text-xs text-gray-500">+50 điểm</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sidebar -->
+                            <div class="space-y-6">
+                                <!-- Top Contributors -->
+                                <div class="bg-white border border-gray-200 rounded-lg p-4">
+                                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Top đóng góp tuần này</h3>
+                                    <div class="space-y-3">
+                                        <div class="flex items-center space-x-3" data-mock="true">
+                                            <div class="w-8 h-8 bg-warning rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                                                1
+                                            </div>
+                                            <div class="flex-1">
+                                                <p class="text-sm font-medium text-gray-900">Minh Tuấn</p>
+                                                <p class="text-xs text-gray-500">450 điểm</p>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center space-x-3" data-mock="true">
+                                            <div class="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                                                2
+                                            </div>
+                                            <div class="flex-1">
+                                                <p class="text-sm font-medium text-gray-900">Thu Linh</p>
+                                                <p class="text-xs text-gray-500">380 điểm</p>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center space-x-3" data-mock="true">
+                                            <div class="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                                                3
+                                            </div>
+                                            <div class="flex-1">
+                                                <p class="text-sm font-medium text-gray-900">Hải Nam</p>
+                                                <p class="text-xs text-gray-500">320 điểm</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Community Stats -->
+                                <div class="bg-white border border-gray-200 rounded-lg p-4">
+                                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Thống kê cộng đồng</h3>
+                                    <div class="space-y-3">
+                                        <div class="flex items-center justify-between" data-mock="true">
+                                            <span class="text-sm text-gray-600">Cập nhật hôm nay</span>
+                                            <span class="text-sm font-medium text-gray-900">127</span>
+                                        </div>
+                                        <div class="flex items-center justify-between" data-mock="true">
+                                            <span class="text-sm text-gray-600">Thành viên hoạt động</span>
+                                            <span class="text-sm font-medium text-gray-900">1,234</span>
+                                        </div>
+                                        <div class="flex items-center justify-between" data-mock="true">
+                                            <span class="text-sm text-gray-600">Bãi xe được đăng ký</span>
+                                            <span class="text-sm font-medium text-gray-900">89</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Quick Actions -->
+                                <div class="bg-white border border-gray-200 rounded-lg p-4">
+                                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Hành động nhanh</h3>
+                                    <div class="space-y-2">
+                                        <button class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors" data-page="register-lot">
+                                            <i class="fas fa-plus mr-2 text-primary"></i>
+                                            Đăng ký bãi xe mới
+                                        </button>
+                                        <button class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+                                            <i class="fas fa-flag mr-2 text-warning"></i>
+                                            Báo cáo vấn đề
+                                        </button>
+                                        <button class="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+                                            <i class="fas fa-question-circle mr-2 text-primary"></i>
+                                            Hướng dẫn sử dụng
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rewards Page -->
+                <div id="rewards-page" class="hidden flex-1 bg-white">
+                    <div class="max-w-4xl mx-auto p-4">
+                        <div class="mb-6">
+                            <h1 class="text-2xl font-bold text-gray-900">Điểm thưởng & Tài khoản</h1>
+                            <p class="text-gray-600 mt-1">Quản lý điểm thưởng và thông tin cá nhân</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <!-- Profile & Points -->
+                            <div class="lg:col-span-2 space-y-6">
+                                <!-- Profile Card -->
+                                <div class="bg-gradient-to-r from-primary to-primary-dark rounded-lg p-6 text-white">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center text-2xl font-bold" data-mock="true">
+                                            NV
+                                        </div>
+                                        <div class="flex-1">
+                                            <h2 class="text-xl font-semibold" data-bind="user.name" data-mock="true">Nguyễn Văn A</h2>
+                                            <p class="opacity-90" data-bind="user.email" data-mock="true">nguyenvana@email.com</p>
+                                            <p class="text-sm opacity-75" data-mock="true">Thành viên từ tháng 3/2024</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mt-6 grid grid-cols-2 gap-4">
+                                        <div class="bg-white bg-opacity-20 rounded-lg p-3">
+                                            <p class="text-sm opacity-75">Điểm hiện có</p>
+                                            <p class="text-2xl font-bold" data-bind="user.points" data-mock="true">1,250</p>
+                                        </div>
+                                        <div class="bg-white bg-opacity-20 rounded-lg p-3">
+                                            <p class="text-sm opacity-75">Hạng thành viên</p>
+                                            <p class="text-lg font-semibold" data-mock="true">Bạc</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Recent Activities -->
+                                <div class="bg-white border border-gray-200 rounded-lg p-6">
+                                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Lịch sử đóng góp</h3>
+                                    <div class="space-y-4">
+                                        <div class="flex items-center justify-between py-3 border-b border-gray-100" data-mock="true">
+                                            <div class="flex items-center space-x-3">
+                                                <div class="w-8 h-8 bg-success-100 rounded-full flex items-center justify-center">
+                                                    <i class="fas fa-plus text-success text-xs"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="text-sm font-medium text-gray-900">Cập nhật tình trạng bãi xe</p>
+                                                    <p class="text-xs text-gray-500">Bãi xe Nguyễn Huệ - 2 giờ trước</p>
+                                                </div>
+                                            </div>
+                                            <span class="text-sm font-medium text-success">+10</span>
+                                        </div>
+
+                                        <div class="flex items-center justify-between py-3 border-b border-gray-100" data-mock="true">
+                                            <div class="flex items-center space-x-3">
+                                                <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
+                                                    <i class="fas fa-star text-primary text-xs"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="text-sm font-medium text-gray-900">Đánh giá bãi xe</p>
+                                                    <p class="text-xs text-gray-500">Bãi xe Vincom - Hôm qua</p>
+                                                </div>
+                                            </div>
+                                            <span class="text-sm font-medium text-success">+5</span>
+                                        </div>
+
+                                        <div class="flex items-center justify-between py-3 border-b border-gray-100" data-mock="true">
+                                            <div class="flex items-center space-x-3">
+                                                <div class="w-8 h-8 bg-warning-100 rounded-full flex items-center justify-center">
+                                                    <i class="fas fa-map-marker-alt text-warning text-xs"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="text-sm font-medium text-gray-900">Đăng ký bãi xe mới</p>
+                                                    <p class="text-xs text-gray-500">Bãi xe Cafe ABC - 3 ngày trước</p>
+                                                </div>
+                                            </div>
+                                            <span class="text-sm font-medium text-success">+50</span>
+                                        </div>
+
+                                        <div class="flex items-center justify-between py-3" data-mock="true">
+                                            <div class="flex items-center space-x-3">
+                                                <div class="w-8 h-8 bg-danger-100 rounded-full flex items-center justify-center">
+                                                    <i class="fas fa-minus text-danger text-xs"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="text-sm font-medium text-gray-900">Đổi voucher Grab</p>
+                                                    <p class="text-xs text-gray-500">1 tuần trước</p>
+                                                </div>
+                                            </div>
+                                            <span class="text-sm font-medium text-danger">-100</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Edit Profile -->
+                                <div class="bg-white border border-gray-200 rounded-lg p-6">
+                                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Thông tin cá nhân</h3>
+                                    <form class="space-y-4">
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 mb-2">Họ và tên</label>
+                                                <input type="text" value="Nguyễn Văn A" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:border-transparent" data-mock="true">
+                                            </div>
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 mb-2">Số điện thoại</label>
+                                                <input type="tel" value="0901234567" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:border-transparent" data-mock="true">
+                                            </div>
+                                        </div>
+                                        
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                            <input type="email" value="nguyenvana@email.com" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:border-transparent" data-mock="true">
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Phương tiện chính</label>
+                                            <select class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:border-transparent">
+                                                <option selected>Xe máy</option>
+                                                <option>Ô tô</option>
+                                                <option>Cả hai</option>
+                                            </select>
+                                        </div>
+
+                                        <button type="submit" class="bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-primary-dark transition-colors">
+                                            Cập nhật thông tin
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- Rewards Sidebar -->
+                            <div class="space-y-6">
+                                <!-- Available Rewards -->
+                                <div class="bg-white border border-gray-200 rounded-lg p-4">
+                                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Đổi điểm thưởng</h3>
+                                    <div class="space-y-4">
+                                        <div class="border border-gray-200 rounded-lg p-3" data-mock="true">
+                                            <div class="flex items-center space-x-3 mb-2">
+                                                <i class="fas fa-gift text-warning text-xl"></i>
+                                                <div class="flex-1">
+                                                    <p class="text-sm font-medium text-gray-900">Voucher Grab 20k</p>
+                                                    <p class="text-xs text-gray-500">Giảm 20,000đ cho chuyến đi</p>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center justify-between">
+                                                <span class="text-sm font-medium text-primary">100 điểm</span>
+                                                <button class="bg-primary text-white px-3 py-1 rounded text-xs font-medium hover:bg-primary-dark transition-colors">
+                                                    Đổi
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div class="border border-gray-200 rounded-lg p-3" data-mock="true">
+                                            <div class="flex items-center space-x-3 mb-2">
+                                                <i class="fas fa-coffee text-orange-500 text-xl"></i>
+                                                <div class="flex-1">
+                                                    <p class="text-sm font-medium text-gray-900">Voucher Starbucks</p>
+                                                    <p class="text-xs text-gray-500">Giảm 25,000đ đồ uống</p>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center justify-between">
+                                                <span class="text-sm font-medium text-primary">150 điểm</span>
+                                                <button class="bg-primary text-white px-3 py-1 rounded text-xs font-medium hover:bg-primary-dark transition-colors">
+                                                    Đổi
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div class="border border-gray-200 rounded-lg p-3" data-mock="true">
+                                            <div class="flex items-center space-x-3 mb-2">
+                                                <i class="fas fa-gas-pump text-blue-500 text-xl"></i>
+                                                <div class="flex-1">
+                                                    <p class="text-sm font-medium text-gray-900">Voucher xăng 50k</p>
+                                                    <p class="text-xs text-gray-500">Petrolimex/Shell</p>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center justify-between">
+                                                <span class="text-sm font-medium text-primary">300 điểm</span>
+                                                <button class="bg-gray-300 text-gray-500 px-3 py-1 rounded text-xs font-medium cursor-not-allowed" disabled>
+                                                    Chưa đủ điểm
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Points Guide -->
+                                <div class="bg-white border border-gray-200 rounded-lg p-4">
+                                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Cách kiếm điểm</h3>
+                                    <div class="space-y-3 text-sm">
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-gray-600">Cập nhật tình trạng bãi xe</span>
+                                            <span class="text-success font-medium">+10</span>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-gray-600">Đánh giá bãi xe</span>
+                                            <span class="text-success font-medium">+5</span>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-gray-600">Đăng ký bãi xe mới</span>
+                                            <span class="text-success font-medium">+50</span>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-gray-600">Báo cáo chính xác</span>
+                                            <span class="text-success font-medium">+20</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Member Tiers -->
+                                <div class="bg-white border border-gray-200 rounded-lg p-4">
+                                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Hạng thành viên</h3>
+                                    <div class="space-y-3">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-2">
+                                                <div class="w-3 h-3 bg-gray-400 rounded-full"></div>
+                                                <span class="text-sm text-gray-600">Đồng</span>
+                                            </div>
+                                            <span class="text-xs text-gray-500">0-499 điểm</span>
+                                        </div>
+                                        <div class="flex items-center justify-between bg-gray-50 p-2 rounded">
+                                            <div class="flex items-center space-x-2">
+                                                <div class="w-3 h-3 bg-gray-500 rounded-full"></div>
+                                                <span class="text-sm font-medium text-gray-900">Bạc</span>
+                                            </div>
+                                            <span class="text-xs text-gray-500">500-1499 điểm</span>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-2">
+                                                <div class="w-3 h-3 bg-warning rounded-full"></div>
+                                                <span class="text-sm text-gray-600">Vàng</span>
+                                            </div>
+                                            <span class="text-xs text-gray-500">1500+ điểm</span>
+                                        </div>
+                                    </div>
+                                    <div class="mt-3 bg-gray-200 rounded-full h-2">
+                                        <div class="bg-primary h-2 rounded-full" style="width: 83%"></div>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1" data-mock="true">250 điểm nữa để lên hạng Vàng</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Mobile Bottom Navigation -->
+        <nav class="md:hidden bg-white border-t border-gray-200 fixed bottom-0 left-0 right-0 z-50">
+            <div class="grid grid-cols-5 h-16">
+                <button class="flex flex-col items-center justify-center space-y-1 text-primary" data-page="home">
+                    <i class="fas fa-home text-lg"></i>
+                    <span class="text-xs">Trang chủ</span>
+                </button>
+                <button class="flex flex-col items-center justify-center space-y-1 text-gray-400" data-page="search">
+                    <i class="fas fa-search text-lg"></i>
+                    <span class="text-xs">Tìm kiếm</span>
+                </button>
+                <button class="flex flex-col items-center justify-center space-y-1 text-gray-400" data-page="register-lot">
+                    <i class="fas fa-plus-circle text-lg"></i>
+                    <span class="text-xs">Đăng ký</span>
+                </button>
+                <button class="flex flex-col items-center justify-center space-y-1 text-gray-400" data-page="community">
+                    <i class="fas fa-users text-lg"></i>
+                    <span class="text-xs">Cộng đồng</span>
+                </button>
+                <button class="flex flex-col items-center justify-center space-y-1 text-gray-400" data-page="rewards">
+                    <i class="fas fa-gift text-lg"></i>
+                    <span class="text-xs">Thưởng</span>
+                </button>
+            </div>
+        </nav>
+    </div>
+    <!-- @END_COMPONENT: MainApp -->
+
+    <script>
+        (function() {
+            // Simple page navigation
+            function showPage(pageId) {
+                // Hide all pages
+                const pages = ['home-page', 'search-page', 'register-lot-page', 'community-page', 'rewards-page'];
+                pages.forEach(page => {
+                    const element = document.getElementById(page);
+                    if (element) {
+                        element.classList.add('hidden');
+                    }
+                });
+
+                // Show selected page
+                const selectedPage = document.getElementById(pageId);
+                if (selectedPage) {
+                    selectedPage.classList.remove('hidden');
+                }
+
+                // Update navigation active states
+                document.querySelectorAll('[data-page]').forEach(nav => {
+                    const navPage = nav.getAttribute('data-page');
+                    nav.classList.remove('text-primary', 'bg-primary', 'text-white');
+                    nav.classList.add('text-gray-400', 'text-gray-700', 'hover:bg-gray-100');
+                    
+                    if (navPage === pageId.replace('-page', '')) {
+                        nav.classList.remove('text-gray-400', 'text-gray-700', 'hover:bg-gray-100');
+                        nav.classList.add('text-primary');
+                        if (nav.closest('aside')) {
+                            nav.classList.add('bg-primary', 'text-white');
+                            nav.classList.remove('text-primary');
+                        }
+                    }
+                });
+            }
+
+            // Handle navigation clicks
+            document.addEventListener('click', function(e) {
+                const pageButton = e.target.closest('[data-page]');
+                if (pageButton) {
+                    e.preventDefault();
+                    const page = pageButton.getAttribute('data-page');
+                    showPage(page + '-page');
+                }
+
+                // Handle parking detail modal
+                if (e.target.closest('[data-event="click:showParkingDetails"]')) {
+                    document.getElementById('parking-detail-modal').classList.remove('hidden');
+                }
+
+                if (e.target.closest('[data-event="click:closeParkingDetail"]')) {
+                    document.getElementById('parking-detail-modal').classList.add('hidden');
+                }
+
+                if (e.target.closest('[data-event="click:stopPropagation"]')) {
+                    e.stopPropagation();
+                }
+            });
+
+            // TODO: Implement business logic for:
+            // - Real-time parking status updates
+            // - GPS location services
+            // - Push notifications for parking availability
+            // - Points system with local storage
+            // - Form validation and submission
+            // - Image upload functionality
+            // - Map integration with actual coordinates
+            // - Community updates and ratings system
+
+            // Initialize with home page
+            showPage('home-page');
+        })();
+    </script>
+</body>
+</html>
