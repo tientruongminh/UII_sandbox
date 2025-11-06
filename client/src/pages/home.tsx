@@ -147,7 +147,7 @@ export default function Home() {
         </div>
 
         {/* Parking Lots List */}
-        <div className="md:w-80 bg-white border-t md:border-t-0 md:border-l border-gray-200 flex flex-col" data-testid="parking-list">
+        <div className="md:w-80 bg-white border-t md:border-t-0 md:border-l border-gray-200 flex flex-col relative z-50" data-testid="parking-list">
           <div className="p-4 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-900">Bãi xe gần bạn</h2>
             <p className="text-sm text-gray-500" data-testid="results-count">
@@ -165,11 +165,12 @@ export default function Home() {
             ) : (
               <div className="divide-y divide-gray-200">
                 {filteredLots.map((lot: ParkingLot) => (
-                  <ParkingCard
-                    key={lot.id}
-                    lot={lot}
-                    onClick={() => handleParkingLotClick(lot)}
-                  />
+                  <div key={lot.id} className="relative z-50"> {/* ensure each card stacks above map/modal */}
+                    <ParkingCard
+                      lot={lot}
+                      onClick={() => handleParkingLotClick(lot)}
+                    />
+                  </div>
                 ))}
               </div>
             )}
@@ -181,6 +182,7 @@ export default function Home() {
       <ParkingDetailModal
         lot={selectedLot}
         open={!!selectedLot}
+        showMap={false}               // <-- thêm prop để tắt map trong modal
         onOpenChange={(open) => !open && setSelectedLot(null)}
       />
     </div>

@@ -3,21 +3,28 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Star, Car, Bike, Navigation, Flag, Share2 } from "lucide-react";
 import type { ParkingLot } from "@shared/schema";
+import SimpleMap from "@/components/map/simple-map";
 
-interface ParkingDetailModalProps {
+type Props = {
   lot: ParkingLot | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-}
+  showMap?: boolean; // <- mới
+};
 
-export default function ParkingDetailModal({ lot, open, onOpenChange }: ParkingDetailModalProps) {
+export default function ParkingDetailModal({ lot, open, onOpenChange, showMap = true }: Props) {
   if (!lot) return null;
 
   const hasAvailableSpots = lot.currentMotorcycleSpots > 0 || lot.currentCarSpots > 0;
   
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto" data-testid="parking-detail-modal">
+      {/* ensure modal is always on top of everything */}
+      <DialogContent
+        className="max-w-md max-h-[90vh] overflow-y-auto"
+        data-testid="parking-detail-modal"
+        style={{ zIndex: 2147483647 }} // very high inline z-index to override other layers
+      >
         <DialogHeader>
           <DialogTitle data-testid="modal-title">{lot.name}</DialogTitle>
         </DialogHeader>
@@ -134,6 +141,13 @@ export default function ParkingDetailModal({ lot, open, onOpenChange }: ParkingD
             </div>
           )}
         </div>
+
+        {showMap && (
+          <div className="h-64">
+            {/* Hiển thị bản đồ chỉ khi showMap = true */}
+            <SimpleMap parkingLots={lot ? [lot] : []} />
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );
